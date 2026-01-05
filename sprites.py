@@ -1,6 +1,12 @@
 import pygame
 import random
 
+# 版本信息
+__version__ = "2.1"
+__version_history__ = """
+2.1 - 2026-01-05 - 添加英雄上下移动功能,已经对应边缘检测等
+1.0 - 2026-01-03 - 初始版本，基本运行游戏
+"""
 
 # 屏幕大小
 SCREEN_RECT = pygame.Rect(0, 0, 480, 600)

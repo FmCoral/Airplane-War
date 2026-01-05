@@ -4,6 +4,9 @@ from sprites import *
 
 class PlaneGame(object):
     def __init__(self):
+        """
+        初始化
+        """
         # 创建窗口
         self.screen = pygame.display.set_mode(SCREEN_RECT.size)
         # 创建游戏时钟
@@ -12,10 +15,15 @@ class PlaneGame(object):
         self.__create_sprites()
         # 创建敌机
         pygame.time.set_timer(CREATE_ENEMY_EVENT, 500)
+        # 创建英雄
         pygame.time.set_timer(HERO_FIRE_EVENT, 300)
 
 
     def __create_sprites(self):
+        """
+        创建精灵组
+        :return:
+        """
         bg1 = Background()
         bg2 = Background(True)
         self.back_group = pygame.sprite.Group(bg1, bg2)
@@ -29,6 +37,10 @@ class PlaneGame(object):
 
 
     def __event_handler(self):
+        """
+        事件监听
+        :return: bool
+        """
         for event in pygame.event.get():
             # 判断是否退出游戏
             if event.type == pygame.QUIT:
@@ -45,11 +57,16 @@ class PlaneGame(object):
 
         # 使用键盘提供的方法获取键盘按键
         keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_RIGHT]:
-            self.hero.speed = 2
+
+        # 左右飞行
+        if keys_pressed[pygame.K_RIGHT] and keys_pressed[pygame.K_LEFT]:
+            self.hero.speed_x = 0
+
+        elif keys_pressed[pygame.K_RIGHT]:
+            self.hero.speed_x = 4
 
         elif keys_pressed[pygame.K_LEFT]:
-            self.hero.speed = -2
+            self.hero.speed_x = -4
 
         else:
             self.hero.speed_x = 0
@@ -71,6 +88,10 @@ class PlaneGame(object):
 
 
     def __check_collide(self):
+        """
+        碰撞检测
+        :return:
+        """
         # 子弹摧毁敌机
         pygame.sprite.groupcollide(self.hero.bullets, self.enemy_group, True, True)
 
@@ -87,6 +108,10 @@ class PlaneGame(object):
 
 
     def __update_sprites(self):
+        """
+        更新精灵组
+        :return:
+        """
         self.back_group.update()
         self.back_group.draw(self.screen)
 
@@ -102,13 +127,13 @@ class PlaneGame(object):
 
     @staticmethod
     def __game_over():
-        print("game over")
+        print("游戏结束！")
         pygame.quit()
         sys.exit()
 
 
     def start(self):
-        print("begin")
+
         while True:
             # 刷新帧率
             self.clock.tick(FRAME_PER_SEC)

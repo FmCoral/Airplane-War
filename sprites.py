@@ -20,12 +20,14 @@ HERO_FIRE_EVENT = pygame.USEREVENT + 1
 class GameSprite(pygame.sprite.Sprite):
     """飞机大战游戏精灵"""
 
-    def __init__(self, image_name, speed=1):
+    def __init__(self, image_name, speed=1, speed_x=0, speed_y=0):
 
         super().__init__()
         self.image = pygame.image.load(image_name)
         self.rect = self.image.get_rect()
         self.speed = speed
+        self.speed_x = speed_x
+        self.speed_y = speed_y
 
 
     def update(self):
@@ -80,7 +82,7 @@ class Hero(GameSprite):
 
     def __init__(self):
         # 设置image和speed
-        super().__init__("./images/me1.png", 0)
+        super().__init__("./images/me1.png", 0, 0, 0)
         # 设置初始位置
         self.rect.centerx = SCREEN_RECT.centerx
         self.rect.bottom = SCREEN_RECT.bottom - 120
@@ -91,14 +93,24 @@ class Hero(GameSprite):
 
     def update(self):
         # 水平方向移动
-        self.rect.x += self.speed
+        self.rect.x += self.speed_x
 
-        # 控制移动边界
+        # 垂直方向移动
+        self.rect.y += self.speed_y
+
+        # 控制左右移动边界
         if self.rect.x < 0:
             self.rect.x = 0
 
         elif self.rect.right > SCREEN_RECT.right:
             self.rect.right = SCREEN_RECT.right
+
+        # 控制上下移动边界
+        if self.rect.y < 0:
+            self.rect.y = 0
+
+        elif self.rect.bottom >SCREEN_RECT.bottom:
+            self.rect.bottom = SCREEN_RECT.bottom
 
 
     def fire(self):
@@ -115,7 +127,7 @@ class Bullet(GameSprite):
 
     def __init__(self):
         # 设置子弹图片，设置初始速度
-        super().__init__("./images/bullet1.png", -2)
+        super().__init__("./images/bullet1.png", -4)
         pass
 
 

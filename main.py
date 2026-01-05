@@ -52,7 +52,20 @@ class PlaneGame(object):
             self.hero.speed = -2
 
         else:
-            self.hero.speed = 0
+            self.hero.speed_x = 0
+
+        # 上下飞行
+        if keys_pressed[pygame.K_UP] and keys_pressed[pygame.K_DOWN]:
+            self.hero.speed_y = 0
+
+        elif keys_pressed[pygame.K_UP]:
+            self.hero.speed_y = -3
+
+        elif keys_pressed[pygame.K_DOWN]:
+            self.hero.speed_y = 3
+
+        else:
+            self.hero.speed_y = 0
 
         return False
 

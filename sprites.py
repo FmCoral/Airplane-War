@@ -2,8 +2,9 @@ import pygame
 import random
 
 # 版本信息
-__version__ = "2.1"
-__version_history__ = """
+VERSION = "2.2"
+VERSION_HISTORY = """
+2.2 - 2026-01-06 - (1) 修复英雄牺牲后窗口无征兆关闭情况，替换为重新开始和结束游戏按钮\r(2) 添加暂停游戏逻辑
 2.1 - 2026-01-05 - 添加英雄上下移动功能,已经对应边缘检测等
 1.0 - 2026-01-03 - 初始版本，基本运行游戏
 """
@@ -20,14 +21,39 @@ HERO_FIRE_EVENT = pygame.USEREVENT + 1
 class GameSprite(pygame.sprite.Sprite):
     """飞机大战游戏精灵"""
 
-    def __init__(self, image_name, speed=1, speed_x=0, speed_y=0):
+    def __init__(self, image_names, speed=1, speed_x=0, speed_y=0):
 
         super().__init__()
-        self.image = pygame.image.load(image_name)
+        # 1. 处理图片参数：兼容单图片和多图片
+        if isinstance(image_names, str):  # 如果传入单图片路径
+            self.image_names = [image_names]  # 转为列表，统一处理
+        else:  # 如果传入多图片
+            self.image_names = image_names
+
+        # 2. 加载所有图片，存储在列表
+        self.images = []
+        for img_name in self.image_names:
+            img = pygame.image.load(img_name)
+            self.images.append(img)
+
+        self.image = self.images[0]
         self.rect = self.image.get_rect()
         self.speed = speed
         self.speed_x = speed_x
         self.speed_y = speed_y
+        self.index = 0
+
+
+    def switch_image(self, index):
+        """
+        切换显示图片
+        """
+        if 0 <= index < len(self.images):
+            self.index = index
+            self.image = self.images[index]
+            center = self.rect.center
+            self.rect = self.image.get_rect()
+            self.rect.center = center
 
 
     def update(self):
@@ -120,7 +146,7 @@ class Hero(GameSprite):
         bullet.rect.bottom = self.rect.y - 20
         bullet.rect.centerx = self.rect.centerx
         # 将精灵添加到精灵组
-        self.bullets.add(bullet)
+        self.bullets.add(bullet) # type:ignore
 
 
 class Bullet(GameSprite):
@@ -128,8 +154,6 @@ class Bullet(GameSprite):
     def __init__(self):
         # 设置子弹图片，设置初始速度
         super().__init__("./images/bullet1.png", -4)
-        pass
-
 
     def update(self):
         # 让子弹沿垂直方向飞行
@@ -139,6 +163,47 @@ class Bullet(GameSprite):
         if self.rect.bottom < 0:
             self.kill()
 
-
     def __del__(self):
         pass
+
+
+class Button(GameSprite):
+    """单个按钮类"""
+    def __init__(self, image_names, pos_x, pos_y):
+        super().__init__(image_names)
+        # 按钮位置
+        self.rect.centerx = pos_x
+        self.rect.centery = pos_y
+        self.current_img_index = 0
+
+    def is_clicked(self, mouse_pos):
+        """检测当前按钮是否被点击"""
+        return self.rect.collidepoint(mouse_pos)
+
+    def update(self):
+        pass
+
+
+class AgainButton(Button):
+    def __init__(self):
+        # 重来按钮： 屏幕中间偏下位置
+        super().__init__("./images/again.png", 240, 300)
+
+
+class GameOverButton(Button):
+    def __init__(self):
+        # 结束按钮：屏幕中间位置
+        super().__init__("./images/game_over.png", 240, 400)
+
+
+class PauseButton(Button):
+    def __init__(self):
+        # 暂停按钮：屏幕右上角
+        super().__init__(
+            "./images/pause_nor.png",440, 30)
+
+
+class ResumeButton(Button):
+    def __init__(self):
+        # 继续按钮：和暂停按钮同一位置
+        super().__init__("./images/resume_nor.png", 440, 30)

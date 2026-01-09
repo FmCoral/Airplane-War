@@ -51,6 +51,13 @@ class PlaneGame(object):
         self.is_paused = False  # 标记游戏是否暂停
         self.is_game_over = False  # 标记游戏是否结束
 
+        # 版本信息
+        self.version = __version__
+        self.font = pygame.font.Font(None, 20)  # 字号20，系统默认字体
+        self.version_text = f"v{self.version}"  # 拼接成 v2.2 格式
+        self.version_surface = self.font.render(self.version_text, True, (100, 100, 100))
+        self.version_rect = self.version_surface.get_rect(topleft=(SCREEN_RECT.x+10, SCREEN_RECT.bottom-20))  # 位置：左下角
+
 
     def __event_handler(self):
         """
@@ -166,6 +173,9 @@ class PlaneGame(object):
             self.hero.bullets.empty()
             self.button_group.empty()
             self.game_over_group.draw(self.screen)
+
+        # 绘制版本号
+        self.screen.blit(self.version_surface, self.version_rect)
 
 
     @staticmethod
